@@ -1,0 +1,108 @@
+---
+title: "Kindergarten"
+author: "Juliana Rosa"
+date: "April 12, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Loading and Cleaning Data
+
+```{r}
+#Loading data and packages
+kindergarten_data <- read.csv("kindergarten_CA.csv")
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+#Cleaning data with dplyr
+kindergarten_data%<>%
+  rename(immune=complete, enrollments=enrollment, id=sch_code, year=start_year, funding=pub_priv)%>%
+  mutate(proportion=immune/enrollments)%>%
+  select(id, school, year, county, district, funding, immune, enrollments, proportion)%>%
+  arrange(id)%>%
+  filter(complete.cases(kindergarten_data), id!="", school!="", year!="", county!="", district!="", funding!="", immune!="", enrollments!="", proportion!="")
+```
+
+```{r}
+#Taking a sample
+set.seed(2)
+my_sample <- kindergarten_data[sample(1:nrow(kindergarten_data), 107), ]
+```
+
+###Exploration of Variables with Simple Graphs
+
+```{r}
+#year
+ggplot(my_sample, aes(year))+
+  geom_bar()
+```
+
+```{r}
+#county
+ggplot(my_sample, aes(county))+
+  geom_bar()
+```
+
+```{r}
+#district
+ggplot(my_sample, aes(district))+
+  geom_bar()
+```
+
+```{r}
+#funding
+ggplot(my_sample, aes(funding))+
+  geom_bar()+
+  coord_polar()
+```
+
+```{r}
+#immune
+ggplot(my_sample, aes(immune))+
+  geom_histogram()
+```
+
+```{r}
+#proportion
+ggplot(my_sample, aes(proportion))+
+  geom_histogram()
+```
+
+###Statistical Analysis
+
+```{r}
+#Creating a boxplot
+ggplot(my_sample, aes(y=enrollments))+
+  geom_boxplot(fill="cadetblue4", outlier.color="cadetblue4", outlier.shape=8)+
+  theme_light()+
+  ylab("Enrollments")+
+  ggtitle("Distribution of Enrollments")
+
+#Looking at some summary statistics
+fivenum(my_sample$enrollments)
+```
+
+###Final Visualization
+
+```{r}
+#Creating a scatterplot
+set.seed(3)
+ggplot(my_sample, aes(x=year, y=enrollments, size=proportion, color=funding))+
+  geom_jitter(alpha=0.5)+
+  scale_color_manual(values=c("aquamarine4", "blueviolet"))+
+  scale_size(range=c(0.8, 3.2))+
+  theme_light()+
+  xlab("Year")+
+  ylab("Enrollments")+
+  guides(color=guide_legend(title=NULL))+
+  guides(size=guide_legend(title="Proportion"))+
+  labs(title="Kindergarten Schools in CA", subtitle="Number of Enrollments and Proportion of Immune Kids")
+```
+
+###Interactivity with Tableau
+https://public.tableau.com/profile/juliana3304#!/vizhome/Exam2_15552135406460/KindergartenScatterplot?publish=yes

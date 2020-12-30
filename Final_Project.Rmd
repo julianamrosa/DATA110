@@ -1,0 +1,126 @@
+---
+title: "Titanic"
+author: "Juliana Rosa"
+date: "April 29, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Source: https://www.kaggle.com/c/titanic
+
+###Loading and Cleaning Data
+
+```{r}
+#Loading data and packages
+titanic <- read.csv("titanic.csv")
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+#Cleaning the data
+titanic%<>%
+  mutate(Family_Members_Aboard=Siblings.Spouses.Aboard+Parents.Children.Aboard)%>%
+  rename(Class=Pclass)%>%
+  select(Name, Survived, Class, Sex, Age, Family_Members_Aboard, Fare)%>%
+  arrange(Name)
+```
+
+```{r}
+#Adjusting Survived values
+survived_vector <- as.numeric(titanic$Survived)
+survived_list <- list()
+for (i in 1:887){
+  survived_list <- append(survived_list, survived_vector[i])
+}
+for (i in 1:887){
+  if (survived_list[[i]]==0){
+    survived_list[i] <- "No"
+  }
+  else{
+    survived_list[i] <- "Yes"
+  }
+}
+survived_vector <- as.character(survived_list)
+survived_factor <- as.factor(survived_vector)
+titanic$Survived <- survived_factor
+```
+
+###Exploratory Graphs
+
+```{r}
+#Survived
+ggplot(titanic, aes(Survived))+
+  geom_bar()+
+  coord_polar()
+```
+
+```{r}
+#Class
+ggplot(titanic, aes(Class))+
+  geom_bar()
+```
+
+```{r}
+#Sex
+ggplot(titanic, aes(Sex))+
+  geom_bar()
+```
+
+```{r}
+#Age
+ggplot(titanic, aes(Age))+
+  geom_freqpoly()
+```
+
+```{r}
+#Family_Members_Aboard
+ggplot(titanic, aes(Family_Members_Aboard))+
+  geom_density()
+```
+
+```{r}
+#Fare
+ggplot(titanic, aes(Fare))+
+  geom_histogram()
+```
+
+###Linear Regression
+
+```{r}
+#Creating a scatterplot with a linear line
+set.seed(10)
+ggplot(titanic, aes(Class, Fare))+
+  geom_jitter(alpha=0.5, color="brown1")+
+  geom_smooth(se=FALSE, method=lm, color="brown")+
+  theme_bw()+
+  ggtitle("Association Between Class and Fare")
+```
+
+
+```{r}
+#Studying the association between Class and Fare
+fit1 <- lm(Fare~Class, data=titanic)
+summary(fit1)
+#y=107.606-32.661x
+```
+
+###Final Visualization
+
+```{r}
+#Creating bar charts for survival counts
+ggplot(titanic, aes(Survived, fill=Sex))+
+  geom_bar(position="dodge")+
+  facet_wrap(~Class)+
+  theme_bw()+
+  ylab("Count")+
+  scale_fill_discrete(labels=c("Female", "Male"))+
+  ggtitle("Survival Count for Males and Females in Each Class")
+```
+
+###Interactivity with Tableau
+
+https://public.tableau.com/profile/juliana3304#!/vizhome/FinalProject_15565666107990/AgeDistribution?publish=yes

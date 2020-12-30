@@ -1,0 +1,57 @@
+---
+title: "Exam 1"
+author: "Juliana Rosa"
+date: "March 2, 2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Loading the data
+setwd("~/DATA101/Project_2")
+movies_data <- read.csv("movies_data.csv")
+```
+
+
+```{r}
+#Taking a sample
+set.seed(1)
+my_sample <- movies_data[sample(1:nrow(movies_data), 383), ]
+```
+
+```{r}
+#Loading the ggplot2 package
+library(ggplot2)
+```
+
+```{r}
+#Creating a boxplot
+ggplot(my_sample, aes(country, imdb_score))+
+  geom_boxplot()+
+  ggtitle("Distribution of IMDB Scores Across Countries")+
+  xlab("Countries")+
+  ylab("IMDB Scores")
+```
+
+```{r}
+#Creating a scatterplot
+ggplot(my_sample, aes(year, profit))+
+  geom_point()+
+  ggtitle("Movie Profits Throughout the Years")+
+  xlab("Year")+
+  ylab("Profit")
+```
+
+```{r}
+#Creating a bar chart
+ggplot(my_sample, aes(content_rating))+
+  geom_bar()+
+  ggtitle("Content Rating Count")+
+  xlab("Content Rating")+
+  ylab("Count")
+```
+
+#Essay
